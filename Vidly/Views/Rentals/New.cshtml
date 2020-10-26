@@ -1,0 +1,167 @@
+﻿
+@{
+    ViewBag.Title = "New";
+}
+
+<h2>New</h2>
+
+
+
+<form id="newRentalForm">
+    <div class="form-group">
+        <label>Customer</label>
+        <div class="tt-container">
+            <input type="text" name="customersInput" required data-rule-validateCustomer="true" value="" class="form-control" id="customersInput" />
+        </div>
+    </div>
+    <div class="form-group">
+        <label>Movie</label>
+        <div class="tt-container">
+            <input type="text" name="moviesInput" data-rule-validateMovies="true" value="" class="form-control" id="moviesInput" />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4 col-sm-4">
+            <ul id="movies" class="list-group col-md-4">
+            </ul>
+        </div>
+    </div>
+
+
+    <button class="btn btn-primary">Submit</button>
+</form>
+
+@section scripts{
+
+
+    @Scripts.Render("~/bundles/jqueryval")
+
+    <script>
+
+
+        $(document).ready(function () {
+
+
+            var vm = {
+                moviesIds: []
+            };
+
+            var customers = new Bloodhound({
+                datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
+                queryTokenizer: Bloodhound.tokenizers.whitespace,
+                remote: {
+                    url: '/api/customers?query=%QUERY',
+                    wildcard: '%QUERY'
+                }
+            });
+
+
+
+
+            $('#customersInput').typeahead(
+                {
+                    minLength: 2,
+                    highlight: true
+                },
+
+                {
+                    name: 'customers',
+                    display: 'name',
+                    source: customers
+                }).on("typeahead:select", function (e, customers) {
+                    vm.customerId = customers.id;
+                    console.log(vm);
+                });
+
+
+
+            var movies = new Bloodhound({
+                datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
+                queryTokenizer: Bloodhound.tokenizers.whitespace,
+                remote: {
+                    url: '/api/movies?query=%QUERY',
+                    wildcard: '%QUERY'
+                }
+            });
+
+            $('#moviesInput').typeahead({
+                minLength: 2,
+                highlight: true
+            }, {
+                    name: 'movies',
+                    display: 'name',
+                    source: movies
+                }).on("typeahead:select", function (e, movie) {
+                    $("#movies").append("<li class='list-group-item'>" + movie.name + "</li>");
+
+                    vm.moviesIds.push(movie.id);
+                    $("#moviesInput").typeahead("val", "");
+                });
+
+
+
+
+            $.validator.addMethod("validateMovies", function () {
+                debugger
+                return vm.moviesIds.length > 0;
+            }, "Add at least one movie");
+
+            $.validator.addMethod("validateCustomer", function () {
+                //debugger
+                return vm.customerId && vm.customerId !== 0;
+            }, "Select a valid customer.");
+
+
+
+            var rentalForm = $("#newRentalForm").validate({
+                submitHandler: function (form, e) {
+                    //debugger;
+                    e.preventDefault();
+
+                    $.ajax({
+
+                        url: "/api/NewRentals",
+                        method: "post",
+                        data: vm
+                    })
+                        .done(function () {
+                            toastr.success("Reantal created", "Sisas")
+
+                            $("#customersInput").typeahead("val", "");
+                            $("#moviesInput").typeahead("val", "");
+                            $("#movies").empty();
+
+                            rentalForm.resetForm();
+
+                            vm = { moviesIds:[]};
+
+
+
+
+
+                        })
+                        .fail(function () {
+                            toastr.error("Something is wrong")
+
+                        });
+
+                    return false;
+
+                }
+
+
+
+            });
+
+
+        });
+
+
+
+
+
+
+    </script>
+
+
+}

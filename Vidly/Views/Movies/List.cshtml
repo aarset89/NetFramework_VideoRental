@@ -1,0 +1,95 @@
+﻿@model IEnumerable<Vidly.Models.Movie>
+@{
+    ViewBag.Title = "Movies";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<h2>Movies</h2>
+
+<p>
+    @using (Html.BeginForm("New", "Movies"))
+    {
+        <button type="submit" class="btn btn-primary">New Movie</button>
+    }
+</p>
+
+<table class="table table-bordered table-hover" id="moviesTable">
+    <thead>
+        <tr>
+            <th>Movie</th>
+            <th>Stock</th>
+            <th>Release date</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+       
+    </tbody>
+</table>
+
+@section scripts{
+ 
+<script>
+
+    $(document).ready(function () {
+
+        var movieTable = $("#moviesTable").DataTable({
+            ajax: {
+                url: "/api/movies",
+                dataSrc: ""
+            },
+            columns: [
+                {
+                    data:"name"
+                },
+                {
+                    data: "stock"
+                },
+                {
+                    data: "releaseDate",
+                    render: function (data) {
+                        var date = data.split("T");
+                        return date[0];
+                    }
+                },
+                {
+                    data: "id",
+                    render: function (data, type, movie) {
+                        return "<button class='btn btn-danger glyphicon glyphicon-trash js-delete' data-movie-id=" + movie.id + "></button> " +
+                            " <button class='btn btn-info glyphicon glyphicon-pencil js-edit' data-movie-id=" + movie.id + "></button>";
+                    }
+                }
+            ]
+
+
+        });
+
+        $("#moviesTable").on("click", ".js-delete", function () {
+            var button = $(this);
+            bootbox.confirm("sure", function (result) {
+                if (result) {
+                    $.ajax({
+                        url: "/api/movies/" + button.attr("data-movie-id"),
+                        method: "delete",
+                        success: function () {
+                            movieTable.row(button.parents("tr")).remove().draw();
+                        }
+                    })
+                }
+            });
+        });
+
+
+        $("#moviesTable").on("click", ".js-edit", function () {
+            var button = $(this);
+            window.location.replace("/movies/edit/"+button.attr("data-movie-id"))
+        });
+
+
+
+
+    });
+
+
+</script>
+
+}

@@ -1,0 +1,24 @@
+    <table class="table table-bordered table-hover" id="costumersTable">
+        <thead>
+            <tr>
+                <th>Customer</th>
+                <th>Membership Type</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var customer in Model)
+            {
+                <tr>
+                    <td>@Html.ActionLink(customer.Name, "Details", "Customers", new { id = customer.Id }, new { @class = "js-delete" })</td>
+                    <td>@customer.MembershipType.Name</td>
+                    <td class="btn-group">
+                        @Html.ActionLink("Edit", "Edit", "Customers", new { customer.Id }, new { @class = "btn btn-warning" })
+                        <button data-customer-id="@customer.Id" class="btn-link js-delete">Delete</button>
+                    </td>
+                    @*<td> <button type="button" class="btn btn-warning"  >Edit</button></td>*@
+
+                </tr>
+            }
+        </tbody>
+    </table>

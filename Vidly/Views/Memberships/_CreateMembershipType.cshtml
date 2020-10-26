@@ -1,0 +1,33 @@
+﻿@model Vidly.ViewModels.MembershipTypesViewModel
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="form-group">
+    @Html.LabelFor(m => m.MembershipType.Name)
+    @Html.TextBoxFor(m => m.MembershipType.Name, new { @class = "form-control" })
+</div>
+<div class="form-group ">
+
+    @Html.LabelFor(m => m.MembershipType.SignUpFee)
+    @Html.TextBoxFor(m => m.MembershipType.SignUpFee, new { @class = "form-control" })
+</div>
+<div class="form-group">
+
+    @Html.LabelFor(m => m.MembershipType.DurationInMonths)
+    @Html.TextBoxFor(m => m.MembershipType.DurationInMonths, new { @class = "form-control", @id = "membershipTypeDuration", @type = "number" })
+    @Html.ValidationMessageFor(m => m.MembershipType.DurationInMonths)
+</div>
+<div class="form-group">
+    @Html.LabelFor(m => m.MembershipType.DiscountRate)
+    @Html.TextBoxFor(m => m.MembershipType.DiscountRate, new { @class = "form-control", @id = "discountRate", @type = "number" })
+    @Html.ValidationMessageFor(m => m.MembershipType.DiscountRate)
+</div>
+<div class="modal-body table-placeholder">
+    @Html.ActionLink("Close", "", "", new { @class = "btn btn-danger", @id = "btnCloseModal" })
+
+    @Html.HiddenFor(m => m.MembershipType.Id)
+
+    <button type="submit" class="btn btn-success" id="btnSave">Save</button>
+</div>
